@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Haven Funeral Home - Operations Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <span class="logo-icon">&#9883;</span>
+                <h1>Eternal Haven</h1>
+                <p class="login-subtitle">Funeral Home Operations Manager</p>
+            </div>
+            <form id="login-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                <button type="button" id="demo-login-btn" class="btn btn-outline btn-block">Demo Login</button>
+            </form>
+            <p class="login-footer">Secure. Professional. Compassionate.</p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD (hidden until login) -->
+    <div id="main-app" class="main-app hidden">
+
+        <!-- TOP NAVBAR -->
+        <nav class="top-navbar">
+            <div class="navbar-left">
+                <button id="sidebar-toggle" class="sidebar-toggle">&#9776;</button>
+                <span class="navbar-logo">&#9883;</span>
+                <span class="navbar-title">Eternal Haven Funeral Home</span>
+            </div>
+            <div class="navbar-right">
+                <span class="user-info" id="user-info">Admin User</span>
+                <button id="logout-btn" class="btn btn-sm btn-outline">Logout</button>
+            </div>
+        </nav>
+
+        <!-- LAYOUT WRAPPER -->
+        <div class="app-layout">
+
+            <!-- SIDEBAR -->
+            <aside id="sidebar" class="sidebar">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item active" data-feature="dashboard">
+                        <span class="sidebar-icon">&#9632;</span>
+                        <span class="sidebar-label">Dashboard</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="cases">
+                        <span class="sidebar-icon">&#9744;</span>
+                        <span class="sidebar-label">Case Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="services">
+                        <span class="sidebar-icon">&#9733;</span>
+                        <span class="sidebar-label">Service Planning</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="compliance">
+                        <span class="sidebar-icon">&#9878;</span>
+                        <span class="sidebar-label">Regulatory Compliance</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="pricing">
+                        <span class="sidebar-icon">&#36;</span>
+                        <span class="sidebar-label">Pricing Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="preneed">
+                        <span class="sidebar-icon">&#9998;</span>
+                        <span class="sidebar-label">Pre-Need Planning</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="atneed">
+                        <span class="sidebar-icon">&#9888;</span>
+                        <span class="sidebar-label">At-Need Services</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="grief">
+                        <span class="sidebar-icon">&#9829;</span>
+                        <span class="sidebar-label">Grief Support</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="inventory">
+                        <span class="sidebar-icon">&#9744;</span>
+                        <span class="sidebar-label">Inventory Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="staff">
+                        <span class="sidebar-icon">&#9823;</span>
+                        <span class="sidebar-label">Staff Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="documents">
+                        <span class="sidebar-icon">&#9776;</span>
+                        <span class="sidebar-label">Document Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="cremation">
+                        <span class="sidebar-icon">&#8902;</span>
+                        <span class="sidebar-label">Cremation Services</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="fleet">
+                        <span class="sidebar-icon">&#9654;</span>
+                        <span class="sidebar-label">Fleet Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="memorial">
+                        <span class="sidebar-icon">&#10047;</span>
+                        <span class="sidebar-label">Memorial Products</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="obituaries">
+                        <span class="sidebar-icon">&#9998;</span>
+                        <span class="sidebar-label">Obituary Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="embalming">
+                        <span class="sidebar-icon">&#9879;</span>
+                        <span class="sidebar-label">Embalming Records</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="cemetery">
+                        <span class="sidebar-icon">&#10014;</span>
+                        <span class="sidebar-label">Cemetery Plots</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="insurance">
+                        <span class="sidebar-icon">&#9851;</span>
+                        <span class="sidebar-label">Insurance Claims</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="vendors">
+                        <span class="sidebar-icon">&#9670;</span>
+                        <span class="sidebar-label">Vendor Management</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="appointments">
+                        <span class="sidebar-icon">&#9200;</span>
+                        <span class="sidebar-label">Appointments</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="financial">
+                        <span class="sidebar-icon">&#9830;</span>
+                        <span class="sidebar-label">Financial Records</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="communications">
+                        <span class="sidebar-icon">&#9993;</span>
+                        <span class="sidebar-label">Communications</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="flowers">
+                        <span class="sidebar-icon">&#10048;</span>
+                        <span class="sidebar-label">Flower Orders</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="facility">
+                        <span class="sidebar-icon">&#9962;</span>
+                        <span class="sidebar-label">Facility Rooms</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="aftercare">
+                        <span class="sidebar-icon">&#10084;</span>
+                        <span class="sidebar-label">Aftercare Program</span>
+                    </li>
+                    <li class="sidebar-item sidebar-item-ai" data-feature="alerts">
+                        <span class="sidebar-icon">&#9888;</span>
+                        <span class="sidebar-label">Alerts Center</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="calendar">
+                        <span class="sidebar-icon">&#128197;</span>
+                        <span class="sidebar-label">Calendar</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="pipeline">
+                        <span class="sidebar-icon">&#9654;</span>
+                        <span class="sidebar-label">Case Pipeline</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="reports">
+                        <span class="sidebar-icon">&#128202;</span>
+                        <span class="sidebar-label">Financial Reports</span>
+                    </li>
+                    <li class="sidebar-item" data-feature="ai">
+                        <span class="sidebar-icon">&#9881;</span>
+                        <span class="sidebar-label">AI Assistant</span>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="main-content" id="main-content">
+
+                <!-- DASHBOARD HOME VIEW -->
+                <div id="view-dashboard" class="view active">
+                    <div class="view-header">
+                        <h2>Operations Dashboard</h2>
+                        <p class="view-subtitle">Welcome to Eternal Haven Funeral Home Management System</p>
+                    </div>
+
+                    <!-- KPI Stats Bar -->
+                    <div class="kpi-grid" id="kpi-grid">
+                        <div class="kpi-card kpi-primary">
+                            <div class="kpi-value" id="kpi-active-cases">--</div>
+                            <div class="kpi-label">Active Cases</div>
+                        </div>
+                        <div class="kpi-card kpi-success">
+                            <div class="kpi-value" id="kpi-monthly-revenue">--</div>
+                            <div class="kpi-label">Monthly Revenue</div>
+                        </div>
+                        <div class="kpi-card kpi-warning">
+                            <div class="kpi-value" id="kpi-unpaid">--</div>
+                            <div class="kpi-label">Unpaid Invoices</div>
+                        </div>
+                        <div class="kpi-card kpi-info">
+                            <div class="kpi-value" id="kpi-appointments">--</div>
+                            <div class="kpi-label">Upcoming Appointments</div>
+                        </div>
+                        <div class="kpi-card kpi-danger" id="kpi-alerts-card" style="cursor:pointer">
+                            <div class="kpi-value" id="kpi-alerts-count">--</div>
+                            <div class="kpi-label">Active Alerts</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-value" id="kpi-staff">--</div>
+                            <div class="kpi-label">Active Staff</div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Events Preview -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h3>Upcoming Events</h3>
+                            <button class="btn btn-sm btn-outline" onclick="document.querySelector('[data-feature=calendar]').click()">View Calendar</button>
+                        </div>
+                        <div class="upcoming-events" id="dashboard-upcoming-events">
+                            <p class="text-muted">Loading events...</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 24px 0 16px; color: var(--navy);">Quick Access</h3>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card" data-feature="cases">
+                            <span class="card-icon">&#9744;</span>
+                            <h3>Case Management</h3>
+                            <p>Manage decedent cases, family contacts, and case status tracking.</p>
+                            <span class="card-count" id="count-cases">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="services">
+                            <span class="card-icon">&#9733;</span>
+                            <h3>Service Planning</h3>
+                            <p>Plan and coordinate funeral services, ceremonies, and events.</p>
+                            <span class="card-count" id="count-services">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="compliance">
+                            <span class="card-icon">&#9878;</span>
+                            <h3>Regulatory Compliance</h3>
+                            <p>Track licenses, permits, and regulatory requirements.</p>
+                            <span class="card-count" id="count-compliance">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="pricing">
+                            <span class="card-icon">&#36;</span>
+                            <h3>Pricing Management</h3>
+                            <p>Manage service pricing, packages, and cost estimates.</p>
+                            <span class="card-count" id="count-pricing">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="preneed">
+                            <span class="card-icon">&#9998;</span>
+                            <h3>Pre-Need Planning</h3>
+                            <p>Pre-arranged funeral plans, contracts, and payments.</p>
+                            <span class="card-count" id="count-preneed">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="atneed">
+                            <span class="card-icon">&#9888;</span>
+                            <h3>At-Need Services</h3>
+                            <p>Immediate need cases and urgent service coordination.</p>
+                            <span class="card-count" id="count-atneed">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="grief">
+                            <span class="card-icon">&#9829;</span>
+                            <h3>Grief Support</h3>
+                            <p>Grief counseling resources and support programs.</p>
+                            <span class="card-count" id="count-grief">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="inventory">
+                            <span class="card-icon">&#9744;</span>
+                            <h3>Inventory Management</h3>
+                            <p>Track caskets, urns, supplies, and merchandise inventory.</p>
+                            <span class="card-count" id="count-inventory">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="staff">
+                            <span class="card-icon">&#9823;</span>
+                            <h3>Staff Management</h3>
+                            <p>Employee records, schedules, and certifications.</p>
+                            <span class="card-count" id="count-staff">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="documents">
+                            <span class="card-icon">&#9776;</span>
+                            <h3>Document Management</h3>
+                            <p>Death certificates, permits, contracts, and forms.</p>
+                            <span class="card-count" id="count-documents">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="cremation">
+                            <span class="card-icon">&#8902;</span>
+                            <h3>Cremation Services</h3>
+                            <p>Cremation scheduling, tracking, and disposition.</p>
+                            <span class="card-count" id="count-cremation">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="fleet">
+                            <span class="card-icon">&#9654;</span>
+                            <h3>Fleet Management</h3>
+                            <p>Vehicle fleet, maintenance, and scheduling.</p>
+                            <span class="card-count" id="count-fleet">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="memorial">
+                            <span class="card-icon">&#10047;</span>
+                            <h3>Memorial Products</h3>
+                            <p>Flowers, programs, keepsakes, and tribute items.</p>
+                            <span class="card-count" id="count-memorial">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="obituaries">
+                            <span class="card-icon">&#9998;</span>
+                            <h3>Obituary Management</h3>
+                            <p>Create, review, and publish obituaries.</p>
+                            <span class="card-count" id="count-obituaries">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="embalming">
+                            <span class="card-icon">&#9879;</span>
+                            <h3>Embalming Records</h3>
+                            <p>Track embalming procedures, chemicals, and preparation details.</p>
+                            <span class="card-count" id="count-embalming">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="cemetery">
+                            <span class="card-icon">&#10014;</span>
+                            <h3>Cemetery Plots</h3>
+                            <p>Manage cemetery plots, burial locations, and plot ownership.</p>
+                            <span class="card-count" id="count-cemetery">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="insurance">
+                            <span class="card-icon">&#9851;</span>
+                            <h3>Insurance Claims</h3>
+                            <p>Track insurance policies, claim processing, and payments.</p>
+                            <span class="card-count" id="count-insurance">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="vendors">
+                            <span class="card-icon">&#9670;</span>
+                            <h3>Vendor Management</h3>
+                            <p>Manage florists, caterers, musicians, and suppliers.</p>
+                            <span class="card-count" id="count-vendors">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="appointments">
+                            <span class="card-icon">&#9200;</span>
+                            <h3>Appointments</h3>
+                            <p>Schedule meetings, viewings, and consultations.</p>
+                            <span class="card-count" id="count-appointments">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="financial">
+                            <span class="card-icon">&#9830;</span>
+                            <h3>Financial Records</h3>
+                            <p>Revenue tracking, invoices, payments, and expenses.</p>
+                            <span class="card-count" id="count-financial">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="communications">
+                            <span class="card-icon">&#9993;</span>
+                            <h3>Communications</h3>
+                            <p>Log phone calls, emails, and family correspondence.</p>
+                            <span class="card-count" id="count-communications">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="flowers">
+                            <span class="card-icon">&#10048;</span>
+                            <h3>Flower Orders</h3>
+                            <p>Track incoming flower deliveries and arrangements.</p>
+                            <span class="card-count" id="count-flowers">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="facility">
+                            <span class="card-icon">&#9962;</span>
+                            <h3>Facility Rooms</h3>
+                            <p>Chapel and room booking, facility scheduling.</p>
+                            <span class="card-count" id="count-facility">--</span>
+                        </div>
+                        <div class="dashboard-card" data-feature="aftercare">
+                            <span class="card-icon">&#10084;</span>
+                            <h3>Aftercare Program</h3>
+                            <p>Post-funeral family follow-up and anniversary reminders.</p>
+                            <span class="card-count" id="count-aftercare">--</span>
+                        </div>
+                        <div class="dashboard-card dashboard-card-ai" data-feature="ai">
+                            <span class="card-icon">&#9881;</span>
+                            <h3>AI Insights</h3>
+                            <p>AI-powered analysis, recommendations, and content generation.</p>
+                            <span class="card-count">AI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEATURE VIEWS (one per feature) -->
+                <div id="view-cases" class="view">
+                    <div class="view-header">
+                        <h2>Case Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="cases">+ Add New Case</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="cases" placeholder="Search cases...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-cases">
+                            <thead><tr><th>Case #</th><th>Deceased Name</th><th>Date of Death</th><th>Status</th><th>Assigned Staff</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-services" class="view">
+                    <div class="view-header">
+                        <h2>Service Planning</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="services">+ Add New Service</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="services" placeholder="Search services...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-services">
+                            <thead><tr><th>Service Type</th><th>Date</th><th>Location</th><th>Status</th><th>Cost</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-compliance" class="view">
+                    <div class="view-header">
+                        <h2>Regulatory Compliance</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="compliance">+ Add New Requirement</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="compliance" placeholder="Search compliance...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-compliance">
+                            <thead><tr><th>State</th><th>Requirement</th><th>Type</th><th>Deadline</th><th>Active</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-pricing" class="view">
+                    <div class="view-header">
+                        <h2>Pricing Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="pricing">+ Add New Item</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="pricing" placeholder="Search pricing...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-pricing">
+                            <thead><tr><th>Category</th><th>Item Name</th><th>Price</th><th>Required</th><th>Active</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-preneed" class="view">
+                    <div class="view-header">
+                        <h2>Pre-Need Planning</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="preneed">+ Add New Plan</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="preneed" placeholder="Search pre-need plans...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-preneed">
+                            <thead><tr><th>Client Name</th><th>Plan Type</th><th>Payment</th><th>Status</th><th>Amount</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-atneed" class="view">
+                    <div class="view-header">
+                        <h2>At-Need Services</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="atneed">+ Add New At-Need Case</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="atneed" placeholder="Search at-need cases...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-atneed">
+                            <thead><tr><th>Contact Name</th><th>Urgency</th><th>Date</th><th>Status</th><th>Assigned</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-grief" class="view">
+                    <div class="view-header">
+                        <h2>Grief Support</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="grief">+ Add New Resource</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="grief" placeholder="Search grief support...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-grief">
+                            <thead><tr><th>Resource Name</th><th>Type</th><th>Provider</th><th>Cost</th><th>Active</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-inventory" class="view">
+                    <div class="view-header">
+                        <h2>Inventory Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="inventory">+ Add New Item</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="inventory" placeholder="Search inventory...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-inventory">
+                            <thead><tr><th>Item</th><th>Category</th><th>SKU</th><th>Qty</th><th>Price</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-staff" class="view">
+                    <div class="view-header">
+                        <h2>Staff Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="staff">+ Add New Staff</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="staff" placeholder="Search staff...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-staff">
+                            <thead><tr><th>Name</th><th>Role</th><th>License #</th><th>Status</th><th>Hire Date</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-documents" class="view">
+                    <div class="view-header">
+                        <h2>Document Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="documents">+ Add New Document</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="documents" placeholder="Search documents...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-documents">
+                            <thead><tr><th>Name</th><th>Type</th><th>Case #</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-cremation" class="view">
+                    <div class="view-header">
+                        <h2>Cremation Services</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="cremation">+ Add New Cremation</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="cremation" placeholder="Search cremations...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-cremation">
+                            <thead><tr><th>Cremation #</th><th>Case</th><th>Scheduled</th><th>Status</th><th>Method</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-fleet" class="view">
+                    <div class="view-header">
+                        <h2>Fleet Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="fleet">+ Add New Vehicle</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="fleet" placeholder="Search fleet...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-fleet">
+                            <thead><tr><th>Vehicle</th><th>Type</th><th>Plate</th><th>Mileage</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-memorial" class="view">
+                    <div class="view-header">
+                        <h2>Memorial Products</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="memorial">+ Add New Product</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="memorial" placeholder="Search memorial products...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-memorial">
+                            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Qty</th><th>Active</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-obituaries" class="view">
+                    <div class="view-header">
+                        <h2>Obituary Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="obituaries">+ Add New Obituary</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="obituaries" placeholder="Search obituaries...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-obituaries">
+                            <thead><tr><th>Deceased</th><th>Status</th><th>Publish Date</th><th>AI Generated</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-embalming" class="view">
+                    <div class="view-header">
+                        <h2>Embalming Records</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="embalming">+ Add New Record</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="embalming" placeholder="Search embalming records...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-embalming">
+                            <thead><tr><th>Case</th><th>Embalmer</th><th>Date</th><th>Status</th><th>Viewed</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-cemetery" class="view">
+                    <div class="view-header">
+                        <h2>Cemetery Plots</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="cemetery">+ Add New Plot</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="cemetery" placeholder="Search cemetery plots...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-cemetery">
+                            <thead><tr><th>Cemetery</th><th>Section/Plot</th><th>Type</th><th>Owner</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-insurance" class="view">
+                    <div class="view-header">
+                        <h2>Insurance Claims</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="insurance">+ Add New Claim</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="insurance" placeholder="Search insurance claims...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-insurance">
+                            <thead><tr><th>Company</th><th>Policy #</th><th>Claim Amount</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-vendors" class="view">
+                    <div class="view-header">
+                        <h2>Vendor Management</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="vendors">+ Add New Vendor</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="vendors" placeholder="Search vendors...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-vendors">
+                            <thead><tr><th>Vendor</th><th>Type</th><th>Contact</th><th>Rating</th><th>Active</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-appointments" class="view">
+                    <div class="view-header">
+                        <h2>Appointments</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="appointments">+ Add New Appointment</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="appointments" placeholder="Search appointments...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-appointments">
+                            <thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Client</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-financial" class="view">
+                    <div class="view-header">
+                        <h2>Financial Records</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="financial">+ Add New Transaction</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="financial" placeholder="Search financial records...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-financial">
+                            <thead><tr><th>Type</th><th>Description</th><th>Amount</th><th>Paid</th><th>Date</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-communications" class="view">
+                    <div class="view-header">
+                        <h2>Communications</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="communications">+ Add New Communication</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="communications" placeholder="Search communications...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-communications">
+                            <thead><tr><th>Contact</th><th>Type</th><th>Subject</th><th>Direction</th><th>Date</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-flowers" class="view">
+                    <div class="view-header">
+                        <h2>Flower Orders</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="flowers">+ Add New Order</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="flowers" placeholder="Search flower orders...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-flowers">
+                            <thead><tr><th>Sender</th><th>Type</th><th>Florist</th><th>Delivery</th><th>Received</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-facility" class="view">
+                    <div class="view-header">
+                        <h2>Facility Rooms</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="facility">+ Add New Room/Booking</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="facility" placeholder="Search facility rooms...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-facility">
+                            <thead><tr><th>Room</th><th>Type</th><th>Capacity</th><th>Rate</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-aftercare" class="view">
+                    <div class="view-header">
+                        <h2>Aftercare Program</h2>
+                        <button class="btn btn-primary btn-add-new" data-feature="aftercare">+ Add New Follow-up</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" data-feature="aftercare" placeholder="Search aftercare records...">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="table-aftercare">
+                            <thead><tr><th>Contact</th><th>Program</th><th>Scheduled</th><th>Staff</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ALERTS CENTER VIEW -->
+                <div id="view-alerts" class="view">
+                    <div class="view-header">
+                        <h2>Alerts Center</h2>
+                        <p class="view-subtitle">Expiring licenses, low inventory, overdue items, and compliance deadlines</p>
+                    </div>
+                    <div class="alerts-summary" id="alerts-summary"></div>
+                    <div class="alerts-list" id="alerts-list">
+                        <p class="text-muted">Loading alerts...</p>
+                    </div>
+                </div>
+
+                <!-- CALENDAR VIEW -->
+                <div id="view-calendar" class="view">
+                    <div class="view-header">
+                        <h2>Calendar</h2>
+                        <div class="calendar-nav">
+                            <button class="btn btn-sm btn-outline" id="cal-prev">&larr; Prev</button>
+                            <span id="cal-month-label" style="font-weight:600; font-size:1.1rem; min-width:180px; text-align:center;"></span>
+                            <button class="btn btn-sm btn-outline" id="cal-next">Next &rarr;</button>
+                            <button class="btn btn-sm btn-primary" id="cal-today" style="margin-left:8px;">Today</button>
+                        </div>
+                    </div>
+                    <div class="calendar-container" id="calendar-container"></div>
+                    <div class="calendar-legend">
+                        <span class="legend-item"><span class="legend-dot legend-appointment"></span> Appointment</span>
+                        <span class="legend-item"><span class="legend-dot legend-service"></span> Service</span>
+                        <span class="legend-item"><span class="legend-dot legend-cremation"></span> Cremation</span>
+                        <span class="legend-item"><span class="legend-dot legend-aftercare"></span> Aftercare</span>
+                    </div>
+                </div>
+
+                <!-- CASE PIPELINE VIEW -->
+                <div id="view-pipeline" class="view">
+                    <div class="view-header">
+                        <h2>Case Pipeline</h2>
+                        <p class="view-subtitle">Visual overview of all cases by status</p>
+                    </div>
+                    <div class="pipeline-container" id="pipeline-container">
+                        <p class="text-muted">Loading pipeline...</p>
+                    </div>
+                </div>
+
+                <!-- FINANCIAL REPORTS VIEW -->
+                <div id="view-reports" class="view">
+                    <div class="view-header">
+                        <h2>Financial Reports</h2>
+                        <div class="report-filters">
+                            <div class="form-group form-group-inline">
+                                <label for="report-start">From:</label>
+                                <input type="date" id="report-start" class="search-input" style="max-width:180px;">
+                            </div>
+                            <div class="form-group form-group-inline">
+                                <label for="report-end">To:</label>
+                                <input type="date" id="report-end" class="search-input" style="max-width:180px;">
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="report-generate">Generate Report</button>
+                        </div>
+                    </div>
+                    <div class="report-content" id="report-content">
+                        <p class="text-muted">Select a date range and generate a report, or view current month's data.</p>
+                    </div>
+                </div>
+
+                <!-- AI ASSISTANT VIEW -->
+                <div id="view-ai" class="view">
+                    <div class="view-header">
+                        <h2>AI Assistant</h2>
+                        <p class="view-subtitle">Powered by artificial intelligence to assist your operations</p>
+                    </div>
+                    <div class="ai-container">
+                        <div class="ai-actions">
+                            <button class="btn btn-ai" data-action="generate-obituary">&#9998; Generate Obituary</button>
+                            <button class="btn btn-ai" data-action="compliance-check">&#9878; Compliance Check</button>
+                            <button class="btn btn-ai" data-action="grief-recommendation">&#9829; Grief Recommendations</button>
+                            <button class="btn btn-ai" data-action="pricing-estimate">&#36; Pricing Estimate</button>
+                            <button class="btn btn-ai" data-action="analyze">&#9881; General Analysis</button>
+                        </div>
+                        <div class="ai-input-area">
+                            <label for="ai-prompt">Your Request</label>
+                            <textarea id="ai-prompt" rows="4" placeholder="Describe what you need help with..."></textarea>
+                            <div class="ai-input-options">
+                                <div class="form-group form-group-inline">
+                                    <label for="ai-feature-select">Related Feature:</label>
+                                    <select id="ai-feature-select">
+                                        <option value="">-- General --</option>
+                                        <option value="cases">Case Management</option>
+                                        <option value="services">Service Planning</option>
+                                        <option value="compliance">Compliance</option>
+                                        <option value="pricing">Pricing</option>
+                                        <option value="preneed">Pre-Need</option>
+                                        <option value="atneed">At-Need</option>
+                                        <option value="grief">Grief Support</option>
+                                        <option value="inventory">Inventory</option>
+                                        <option value="staff">Staff</option>
+                                        <option value="documents">Documents</option>
+                                        <option value="cremation">Cremation</option>
+                                        <option value="fleet">Fleet</option>
+                                        <option value="memorial">Memorial Products</option>
+                                        <option value="obituaries">Obituaries</option>
+                                        <option value="embalming">Embalming</option>
+                                        <option value="cemetery">Cemetery Plots</option>
+                                        <option value="insurance">Insurance Claims</option>
+                                        <option value="vendors">Vendors</option>
+                                        <option value="appointments">Appointments</option>
+                                        <option value="financial">Financial Records</option>
+                                        <option value="communications">Communications</option>
+                                        <option value="flowers">Flower Orders</option>
+                                        <option value="facility">Facility Rooms</option>
+                                        <option value="aftercare">Aftercare</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" id="ai-submit-btn">Submit to AI</button>
+                            </div>
+                        </div>
+                        <div class="ai-output-area" id="ai-output">
+                            <div class="ai-placeholder">
+                                <span class="ai-placeholder-icon">&#9881;</span>
+                                <p>Select an AI action or submit a prompt to get started.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div id="detail-modal" class="modal-overlay hidden">
+        <div class="modal modal-detail">
+            <div class="modal-header">
+                <h3 id="detail-modal-title">Record Details</h3>
+                <button class="modal-close" id="detail-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="detail-modal-body">
+                <!-- Detail fields rendered here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="detail-edit-btn">Edit</button>
+                <button class="btn btn-danger" id="detail-delete-btn">Delete</button>
+                <button class="btn btn-outline" id="detail-close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM MODAL -->
+    <div id="form-modal" class="modal-overlay hidden">
+        <div class="modal modal-form">
+            <div class="modal-header">
+                <h3 id="form-modal-title">Add New Record</h3>
+                <button class="modal-close" id="form-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="record-form">
+                    <div id="form-fields-container">
+                        <!-- Form fields rendered here -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="form-save-btn">Save</button>
+                <button class="btn btn-outline" id="form-cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM DELETE MODAL -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal modal-confirm">
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="modal-close" id="confirm-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this record? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+                <button class="btn btn-outline" id="confirm-cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
