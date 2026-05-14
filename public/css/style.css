@@ -1677,3 +1677,67 @@ h4 { font-size: 1rem; font-weight: 600; }
         display: none;
     }
 }
+
+/* ==========================================
+   Pagination Controls
+   ========================================== */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    justify-content: center;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--text-muted, #6b7280);
+    min-width: 160px;
+    text-align: center;
+}
+
+/* ==========================================
+   AI Tools Panel (inside module views)
+   ========================================== */
+.ai-tools-panel {
+    background: linear-gradient(135deg, #f0f4ff 0%, #fafbff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 20px;
+}
+
+.ai-tools-panel h4 {
+    margin: 0 0 12px;
+    color: #4338ca;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.ai-tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.ai-tools-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6b7280);
+    margin: 10px 0 0;
+}
+
+.btn-ai-tool {
+    background: #4338ca;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-ai-tool:hover {
+    background: #3730a3;
+}

@@ -675,7 +675,8 @@
         currentData: {},
         currentRecord: null,
         currentAction: null, // 'add' or 'edit'
-        selectedAiAction: null
+        selectedAiAction: null,
+        pagination: {} // keyed by feature: { page, limit, total, totalPages }
     };
 
     // ==========================================
@@ -697,6 +698,10 @@
                 logout();
                 throw new Error('Session expired. Please log in again.');
             }
+            if (res.status === 429) {
+                showToast('AI rate limit reached. Please wait before making more AI requests.', 'warning');
+                throw new Error('AI rate limit reached. Please wait before making more AI requests.');
+            }
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data.error || data.message || 'Request failed');
@@ -705,6 +710,20 @@
         } catch (err) {
             if (err.message === 'Session expired. Please log in again.') throw err;
             throw err;
+        }
+    }
+
+    // Returns the role from the current JWT without verifying (client-side check only)
+    function getUserRole() {
+        if (state.user && state.user.role) return state.user.role;
+        if (!state.token) return null;
+        try {
+            var parts = state.token.split('.');
+            if (parts.length !== 3) return null;
+            var payload = JSON.parse(atob(parts[1]));
+            return payload.role || null;
+        } catch (e) {
+            return null;
         }
     }
 
@@ -882,9 +901,9 @@
             var countEl = document.getElementById('count-' + key);
             if (countEl) {
                 try {
-                    var data = await api('GET', FEATURES[key].endpoint);
-                    var items = Array.isArray(data) ? data : (data.data || data.items || []);
-                    countEl.textContent = items.length + ' records';
+                    var data = await api('GET', FEATURES[key].endpoint + '?page=1&limit=1');
+                    var total = data && data.pagination ? data.pagination.total : (Array.isArray(data) ? data.length : (data.data ? data.data.length : 0));
+                    countEl.textContent = total + ' records';
                 } catch (e) {
                     countEl.textContent = '--';
                 }
@@ -1333,22 +1352,63 @@
         });
     }
 
-    async function loadFeatureData(feature) {
+    async function loadFeatureData(feature, page) {
         var config = FEATURES[feature];
         if (!config) return;
 
+        // Determine page and limit
+        var currentPage = page || (state.pagination[feature] ? state.pagination[feature].page : 1);
+        var limit = 20;
+
         try {
-            var data = await api('GET', config.endpoint);
-            var items = Array.isArray(data) ? data : (data.data || data.items || []);
+            var url = config.endpoint + '?page=' + currentPage + '&limit=' + limit;
+            var data = await api('GET', url);
+
+            var items, pagination;
+            if (data && data.pagination) {
+                // Paginated response
+                items = data.data || [];
+                pagination = data.pagination;
+            } else {
+                // Legacy array response (fallback)
+                items = Array.isArray(data) ? data : (data.data || data.items || []);
+                pagination = { page: 1, limit: items.length, total: items.length, totalPages: 1 };
+            }
+
             items = transformData(feature, items);
             state.currentData[feature] = items;
+            state.pagination[feature] = pagination;
             renderTable(feature, items);
+            renderPagination(feature, pagination);
         } catch (err) {
             showToast('Failed to load ' + config.name + ': ' + err.message, 'error');
             state.currentData[feature] = [];
             renderTable(feature, []);
         }
     }
+
+    function renderPagination(feature, pagination) {
+        var containerId = 'pagination-' + feature;
+        var container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (!pagination || pagination.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        var html = '<div class="pagination-controls">';
+        html += '<button class="btn btn-sm btn-outline" ' + (pagination.page <= 1 ? 'disabled' : '') + ' onclick="window.__goToPage(\'' + feature + '\',' + (pagination.page - 1) + ')">&#8592; Previous</button>';
+        html += '<span class="pagination-info">Page ' + pagination.page + ' of ' + pagination.totalPages + ' (' + pagination.total + ' records)</span>';
+        html += '<button class="btn btn-sm btn-outline" ' + (pagination.page >= pagination.totalPages ? 'disabled' : '') + ' onclick="window.__goToPage(\'' + feature + '\',' + (pagination.page + 1) + ')">Next &#8594;</button>';
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // Expose pagination navigation to inline onclick handlers
+    window.__goToPage = function(feature, page) {
+        loadFeatureData(feature, page);
+    };
 
     // ==========================================
     // TABLE RENDERING
@@ -1486,6 +1546,17 @@
         });
 
         body.appendChild(grid);
+
+        // Role-aware: hide Delete button on financial records for staff role
+        var deleteBtn = document.getElementById('detail-delete-btn');
+        if (deleteBtn) {
+            if (feature === 'financial' && getUserRole() === 'staff') {
+                deleteBtn.style.display = 'none';
+            } else {
+                deleteBtn.style.display = '';
+            }
+        }
+
         document.getElementById('detail-modal').classList.remove('hidden');
     }
 
@@ -1716,7 +1787,7 @@
                 var prompt = document.getElementById('ai-prompt');
                 switch (state.selectedAiAction) {
                     case 'generate-obituary':
-                        prompt.placeholder = 'Provide details about the deceased: full name, dates, family members, career, hobbies, accomplishments...';
+                        prompt.placeholder = 'Provide details about the deceased: full name, dates, family members, career, hobbies, accomplishments... (or enter a Case ID to load from database)';
                         break;
                     case 'compliance-check':
                         prompt.placeholder = 'Enter the state code and describe the case details to check compliance requirements...';
@@ -1726,6 +1797,36 @@
                         break;
                     case 'pricing-estimate':
                         prompt.placeholder = 'Describe the services and merchandise needed for a pricing estimate...';
+                        break;
+                    case 'embalming-report':
+                        prompt.placeholder = 'Enter the Embalming Record ID (numeric) to generate a state-format mortuary report...';
+                        break;
+                    case 'aftercare-email-2':
+                        prompt.placeholder = 'Enter the Case ID to generate a 2-week aftercare follow-up email...';
+                        break;
+                    case 'aftercare-email-4':
+                        prompt.placeholder = 'Enter the Case ID to generate a 1-month aftercare follow-up email...';
+                        break;
+                    case 'aftercare-email-26':
+                        prompt.placeholder = 'Enter the Case ID to generate a 6-month aftercare follow-up email...';
+                        break;
+                    case 'preneed-conversion':
+                        prompt.placeholder = 'Enter the Pre-Need Plan ID to generate a case handoff summary for at-need conversion...';
+                        break;
+                    case 'grief-stage-classifier':
+                        prompt.placeholder = 'Format: <aftercare_id>|<optional family response text>. Example: 5|My family is still struggling.';
+                        break;
+                    case 'permit-checklist':
+                        prompt.placeholder = 'Format: <case_id>|<state_code>|<service_type>. Example: 12|CA|traditional_funeral';
+                        break;
+                    case 'preneed-at-risk':
+                        prompt.placeholder = 'No input required — click Submit to scan all pre-need contracts and surface delinquent ones with AI-drafted outreach.';
+                        break;
+                    case 'memorial-upsell':
+                        prompt.placeholder = 'Format: <case_id>|<family_budget>. Example: 7|5000';
+                        break;
+                    case 'chemical-lot-provenance':
+                        prompt.placeholder = 'No input required — click Submit to view low-stock embalming chemicals with the decedents who consumed each lot.';
                         break;
                     default:
                         prompt.placeholder = 'Describe what you need help with...';
@@ -1742,7 +1843,9 @@
         var selectedFeature = document.getElementById('ai-feature-select').value;
         var action = state.selectedAiAction || 'analyze';
 
-        if (!promptText) {
+        // The two prompt-less tools should be allowed to submit with empty input
+        var promptOptional = (action === 'preneed-at-risk' || action === 'chemical-lot-provenance');
+        if (!promptText && !promptOptional) {
             showToast('Please enter a prompt', 'warning');
             return;
         }
@@ -1750,7 +1853,7 @@
         var outputArea = document.getElementById('ai-output');
         outputArea.innerHTML = '<div class="ai-loading"><div class="spinner"></div><p>AI is processing your request...</p></div>';
 
-        var endpoint, body;
+        var endpoint, body, method = 'POST';
         switch (action) {
             case 'generate-obituary':
                 endpoint = '/ai/generate-obituary';
@@ -1768,19 +1871,145 @@
                 endpoint = '/ai/pricing-estimate';
                 body = { services: promptText, merchandise: '' };
                 break;
+            case 'embalming-report':
+                endpoint = '/ai/embalming-report';
+                body = { embalming_id: promptText };
+                break;
+            case 'aftercare-email-2':
+                endpoint = '/ai/aftercare-email';
+                body = { case_id: promptText, weeks_since_service: 2 };
+                break;
+            case 'aftercare-email-4':
+                endpoint = '/ai/aftercare-email';
+                body = { case_id: promptText, weeks_since_service: 4 };
+                break;
+            case 'aftercare-email-26':
+                endpoint = '/ai/aftercare-email';
+                body = { case_id: promptText, weeks_since_service: 26 };
+                break;
+            case 'preneed-conversion':
+                endpoint = '/ai/preneed-conversion-summary';
+                body = { preneed_id: promptText };
+                break;
+            case 'grief-stage-classifier': {
+                var parts = promptText.split('|');
+                endpoint = '/ai/grief-stage-classifier';
+                body = { aftercare_id: (parts[0] || '').trim(), family_response_text: (parts[1] || '').trim() };
+                break;
+            }
+            case 'permit-checklist': {
+                var pParts = promptText.split('|');
+                endpoint = '/ai/permit-checklist';
+                body = {
+                    case_id: (pParts[0] || '').trim(),
+                    state_code: (pParts[1] || '').trim(),
+                    service_type: (pParts[2] || '').trim(),
+                };
+                break;
+            }
+            case 'preneed-at-risk':
+                endpoint = '/ai/preneed-at-risk';
+                body = {};
+                break;
+            case 'memorial-upsell': {
+                var mParts = promptText.split('|');
+                endpoint = '/ai/memorial-upsell';
+                body = { case_id: (mParts[0] || '').trim(), family_budget: (mParts[1] || '').trim() };
+                break;
+            }
+            case 'chemical-lot-provenance':
+                endpoint = '/embalming-chemical-lots/low-stock-provenance';
+                method = 'GET';
+                body = null;
+                break;
             default:
                 endpoint = '/ai/analyze';
                 body = { feature: selectedFeature, data: {}, prompt: promptText };
         }
 
         try {
-            var data = await api('POST', endpoint, body);
+            var data = method === 'GET' ? await api('GET', endpoint) : await api('POST', endpoint, body);
             renderAIOutput(data);
+
+            // Show auto-save notice for obituaries
+            if (action === 'generate-obituary' && data.saved) {
+                showToast('Obituary auto-saved to Obituary Management (ID: ' + data.obituary_id + ')', 'success');
+            }
         } catch (err) {
-            outputArea.innerHTML = '<div class="ai-result-card"><h4>Error</h4><p>' + escapeHtml(err.message) + '</p></div>';
+            if (!err.message.includes('rate limit')) {
+                outputArea.innerHTML = '<div class="ai-result-card"><h4>Error</h4><p>' + escapeHtml(err.message) + '</p></div>';
+            }
             showToast('AI request failed: ' + err.message, 'error');
         }
     }
+
+    // Called from inline AI tool buttons inside module views
+    window.__submitCaseAI = function(action, idValue) {
+        var promptInput = document.getElementById('ai-case-id-input');
+        var idToUse = idValue || (promptInput ? promptInput.value.trim() : '');
+        if (!idToUse) {
+            showToast('Please enter the Case ID first', 'warning');
+            return;
+        }
+        state.selectedAiAction = action;
+        // Navigate to AI view and pre-fill
+        navigateTo('ai');
+        setTimeout(function() {
+            document.getElementById('ai-prompt').value = idToUse;
+            // Highlight the corresponding action button
+            document.querySelectorAll('.btn-ai').forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-action') === action);
+            });
+            submitAI();
+        }, 100);
+    };
+
+    window.__submitEmbalmingReport = function(embId) {
+        if (!embId) {
+            showToast('Please enter the Embalming Record ID', 'warning');
+            return;
+        }
+        state.selectedAiAction = 'embalming-report';
+        navigateTo('ai');
+        setTimeout(function() {
+            document.getElementById('ai-prompt').value = embId;
+            document.querySelectorAll('.btn-ai').forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-action') === 'embalming-report');
+            });
+            submitAI();
+        }, 100);
+    };
+
+    // Compliance check: navigate to AI, pre-fill prompt with a note, let user add state code
+    window.__submitComplianceCheck = function(caseId) {
+        state.selectedAiAction = 'compliance-check';
+        navigateTo('ai');
+        setTimeout(function() {
+            document.getElementById('ai-prompt').value = 'CA Case ID: ' + caseId;
+            document.querySelectorAll('.btn-ai').forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-action') === 'compliance-check');
+            });
+            // Update placeholder to guide user
+            document.getElementById('ai-prompt').placeholder = 'Edit the state code above (e.g. CA, TX, NY) and add case details, then submit...';
+            showToast('Edit the state code prefix and click Submit to AI', 'info');
+        }, 100);
+    };
+
+    window.__submitPreneedConversion = function(preneedId) {
+        if (!preneedId) {
+            showToast('Please enter the Pre-Need Plan ID', 'warning');
+            return;
+        }
+        state.selectedAiAction = 'preneed-conversion';
+        navigateTo('ai');
+        setTimeout(function() {
+            document.getElementById('ai-prompt').value = preneedId;
+            document.querySelectorAll('.btn-ai').forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-action') === 'preneed-conversion');
+            });
+            submitAI();
+        }, 100);
+    };
 
     function renderAIOutput(data) {
         var outputArea = document.getElementById('ai-output');

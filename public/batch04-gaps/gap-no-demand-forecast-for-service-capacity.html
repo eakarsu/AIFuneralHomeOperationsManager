@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>No demand forecast for service capacity</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; }
+  .desc { color: #666; margin-bottom: 1.5rem; }
+  textarea { width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; }
+  button { margin-top: 0.75rem; padding: 0.6rem 1.2rem; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: 0.6; }
+  .err { background: #fee; color: #900; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; }
+  pre { background: #f8fafc; padding: 1rem; border-radius: 8px; white-space: pre-wrap; margin-top: 1rem; }
+</style>
+</head>
+<body>
+  <!-- === Batch 04 Gaps & Frontend Mounts === -->
+  <h1>No demand forecast for service capacity</h1>
+  <p class="desc">No demand forecast for service capacity</p>
+  <form id="gap-form">
+    <textarea id="gap-input" placeholder="Enter context or query..."></textarea>
+    <button type="submit" id="gap-btn">Run</button>
+  </form>
+  <div id="gap-error" class="err" style="display:none"></div>
+  <pre id="gap-result" style="display:none"></pre>
+<script>
+document.getElementById('gap-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('gap-btn');
+  const errDiv = document.getElementById('gap-error');
+  const resDiv = document.getElementById('gap-result');
+  errDiv.style.display = 'none';
+  resDiv.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  try {
+    const token = localStorage.getItem('token') || '';
+    const res = await fetch('/api/gap-no-demand-forecast-for-service-capacity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
+      body: JSON.stringify({ input: document.getElementById('gap-input').value, context: {} }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    resDiv.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    resDiv.style.display = 'block';
+  } catch (err) {
+    errDiv.textContent = err.message;
+    errDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Run';
+  }
+});
+</script>
+</body>
+</html>

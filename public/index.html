@@ -404,6 +404,20 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-cases"></div>
+                    <!-- AI Tools for Cases -->
+                    <div class="ai-tools-panel">
+                        <h4>&#9881; AI Tools</h4>
+                        <div class="ai-tools-row">
+                            <input type="number" id="ai-case-id-input" class="search-input" placeholder="Case ID" style="max-width:120px;">
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitCaseAI('generate-obituary', document.getElementById('ai-case-id-input').value)">Generate Obituary</button>
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitCaseAI('aftercare-email-2', document.getElementById('ai-case-id-input').value)">Aftercare Email (2 weeks)</button>
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitCaseAI('aftercare-email-4', document.getElementById('ai-case-id-input').value)">Aftercare Email (1 month)</button>
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitCaseAI('aftercare-email-26', document.getElementById('ai-case-id-input').value)">Aftercare Email (6 months)</button>
+                            <button class="btn btn-sm btn-ai-tool" onclick="(function(){var cid=document.getElementById('ai-case-id-input').value;if(!cid){showToast&&showToast('Enter a Case ID first','warning');return;}window.__submitComplianceCheck(cid);})()">Compliance Check</button>
+                        </div>
+                        <p class="ai-tools-hint">Enter a Case ID above, then click an AI action. Results will appear in the AI Assistant view.</p>
+                    </div>
                 </div>
 
                 <div id="view-services" class="view">
@@ -420,6 +434,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-services"></div>
                 </div>
 
                 <div id="view-compliance" class="view">
@@ -436,6 +451,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-compliance"></div>
                 </div>
 
                 <div id="view-pricing" class="view">
@@ -452,6 +468,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-pricing"></div>
                 </div>
 
                 <div id="view-preneed" class="view">
@@ -467,6 +484,16 @@
                             <thead><tr><th>Client Name</th><th>Plan Type</th><th>Payment</th><th>Status</th><th>Amount</th></tr></thead>
                             <tbody></tbody>
                         </table>
+                    </div>
+                    <div id="pagination-preneed"></div>
+                    <!-- AI Tools for Pre-Need -->
+                    <div class="ai-tools-panel">
+                        <h4>&#9881; AI Tools</h4>
+                        <div class="ai-tools-row">
+                            <input type="number" id="ai-preneed-id-input" class="search-input" placeholder="Plan ID" style="max-width:120px;">
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitPreneedConversion(document.getElementById('ai-preneed-id-input').value)">Convert to Case Summary</button>
+                        </div>
+                        <p class="ai-tools-hint">Enter a Pre-Need Plan ID and click to generate a case handoff summary for at-need conversion.</p>
                     </div>
                 </div>
 
@@ -484,6 +511,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-atneed"></div>
                 </div>
 
                 <div id="view-grief" class="view">
@@ -500,6 +528,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-grief"></div>
                 </div>
 
                 <div id="view-inventory" class="view">
@@ -516,6 +545,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-inventory"></div>
                 </div>
 
                 <div id="view-staff" class="view">
@@ -532,6 +562,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-staff"></div>
                 </div>
 
                 <div id="view-documents" class="view">
@@ -548,6 +579,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-documents"></div>
                 </div>
 
                 <div id="view-cremation" class="view">
@@ -564,6 +596,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-cremation"></div>
                 </div>
 
                 <div id="view-fleet" class="view">
@@ -580,6 +613,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-fleet"></div>
                 </div>
 
                 <div id="view-memorial" class="view">
@@ -596,6 +630,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-memorial"></div>
                 </div>
 
                 <div id="view-obituaries" class="view">
@@ -612,6 +647,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-obituaries"></div>
                 </div>
 
                 <div id="view-embalming" class="view">
@@ -627,6 +663,16 @@
                             <thead><tr><th>Case</th><th>Embalmer</th><th>Date</th><th>Status</th><th>Viewed</th></tr></thead>
                             <tbody></tbody>
                         </table>
+                    </div>
+                    <div id="pagination-embalming"></div>
+                    <!-- AI Tools for Embalming -->
+                    <div class="ai-tools-panel">
+                        <h4>&#9881; AI Tools</h4>
+                        <div class="ai-tools-row">
+                            <input type="number" id="ai-embalming-id-input" class="search-input" placeholder="Embalming ID" style="max-width:140px;">
+                            <button class="btn btn-sm btn-ai-tool" onclick="window.__submitEmbalmingReport(document.getElementById('ai-embalming-id-input').value)">Generate State Report</button>
+                        </div>
+                        <p class="ai-tools-hint">Enter an Embalming Record ID to generate a structured state-format mortuary report.</p>
                     </div>
                 </div>
 
@@ -644,6 +690,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-cemetery"></div>
                 </div>
 
                 <div id="view-insurance" class="view">
@@ -660,6 +707,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-insurance"></div>
                 </div>
 
                 <div id="view-vendors" class="view">
@@ -676,6 +724,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-vendors"></div>
                 </div>
 
                 <div id="view-appointments" class="view">
@@ -692,6 +741,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-appointments"></div>
                 </div>
 
                 <div id="view-financial" class="view">
@@ -708,6 +758,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-financial"></div>
                 </div>
 
                 <div id="view-communications" class="view">
@@ -724,6 +775,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-communications"></div>
                 </div>
 
                 <div id="view-flowers" class="view">
@@ -740,6 +792,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-flowers"></div>
                 </div>
 
                 <div id="view-facility" class="view">
@@ -756,6 +809,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-facility"></div>
                 </div>
 
                 <div id="view-aftercare" class="view">
@@ -772,6 +826,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="pagination-aftercare"></div>
                 </div>
 
                 <!-- ALERTS CENTER VIEW -->
@@ -851,6 +906,16 @@
                             <button class="btn btn-ai" data-action="grief-recommendation">&#9829; Grief Recommendations</button>
                             <button class="btn btn-ai" data-action="pricing-estimate">&#36; Pricing Estimate</button>
                             <button class="btn btn-ai" data-action="analyze">&#9881; General Analysis</button>
+                            <button class="btn btn-ai" data-action="embalming-report">&#9879; Embalming Report</button>
+                            <button class="btn btn-ai" data-action="aftercare-email-2">&#10084; Aftercare Email (2 wks)</button>
+                            <button class="btn btn-ai" data-action="aftercare-email-4">&#10084; Aftercare Email (1 mo)</button>
+                            <button class="btn btn-ai" data-action="aftercare-email-26">&#10084; Aftercare Email (6 mo)</button>
+                            <button class="btn btn-ai" data-action="preneed-conversion">&#9998; Pre-Need Conversion</button>
+                            <button class="btn btn-ai" data-action="grief-stage-classifier">&#9874; Grief Stage Classifier</button>
+                            <button class="btn btn-ai" data-action="permit-checklist">&#10004; State Permit Checklist</button>
+                            <button class="btn btn-ai" data-action="preneed-at-risk">&#9888; Pre-Need At-Risk</button>
+                            <button class="btn btn-ai" data-action="memorial-upsell">&#10047; Memorial Upsell</button>
+                            <button class="btn btn-ai" data-action="chemical-lot-provenance">&#9879; Chemical Lot Provenance</button>
                         </div>
                         <div class="ai-input-area">
                             <label for="ai-prompt">Your Request</label>
