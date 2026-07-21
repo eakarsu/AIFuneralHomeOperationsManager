@@ -3,14 +3,8 @@ require('dotenv').config();
 // ---------------------------------------------------------------------------
 // Startup validation
 // ---------------------------------------------------------------------------
-if (!process.env.OPENROUTER_API_KEY) {
-  console.error('FATAL: OPENROUTER_API_KEY environment variable is not set.');
-  process.exit(1);
-}
-if (!process.env.JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET environment variable is not set.');
-  process.exit(1);
-}
+if (!process.env.OPENROUTER_API_KEY) console.warn('[boot] AI endpoints disabled until OPENROUTER_API_KEY is configured.');
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) throw new Error('JWT_SECRET must be configured with at least 32 characters');
 
 const express = require('express');
 const cors = require('cors');
@@ -22,17 +16,6 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 const db = require('./db');
 
-// === Batch 04 Gaps & Frontend Mounts ===
-const route_gap_no_casketurn_recommendation_ai_for_famil = require('./routes/gap-no-casketurn-recommendation-ai-for-famil');
-const route_gap_no_vendor_performance_scoring_ai = require('./routes/gap-no-vendor-performance-scoring-ai');
-const route_gap_no_demand_forecast_for_service_capacity = require('./routes/gap-no-demand-forecast-for-service-capacity');
-const route_gap_no_after_care_churn_risk_model = require('./routes/gap-no-after-care-churn-risk-model');
-const route_gap_no_real_spa_frontend_public_static = require('./routes/gap-no-real-spa-frontend-public-static');
-const route_gap_no_webhook_subscribersdispatchers = require('./routes/gap-no-webhook-subscribersdispatchers');
-const route_gap_no_real_smtptwilio_integration_only_need = require('./routes/gap-no-real-smtptwilio-integration-only-need');
-const route_gap_no_file_upload_module_for_case = require('./routes/gap-no-file-upload-module-for-case');
-const route_gap_no_real_time_chat_with_families = require('./routes/gap-no-real-time-chat-with-families');
-const route_gap_no_payment_processing = require('./routes/gap-no-payment-processing');
 const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -131,7 +114,7 @@ async function initExtraTables() {
     console.error('initExtraTables error (non-fatal):', err.message);
   }
 }
-initExtraTables();
+// Schema changes are deliberately migration-only; run scripts/migrate.sh before startup.
 
 // JWT authentication middleware
 function authMiddleware(req, res, next) {
@@ -1492,17 +1475,7 @@ try {
 // ---------------------------------------------------------------------------
 // Start server
 // ---------------------------------------------------------------------------
-
-app.use('/api/gap-no-casketurn-recommendation-ai-for-famil', route_gap_no_casketurn_recommendation_ai_for_famil);
-app.use('/api/gap-no-vendor-performance-scoring-ai', route_gap_no_vendor_performance_scoring_ai);
-app.use('/api/gap-no-demand-forecast-for-service-capacity', route_gap_no_demand_forecast_for_service_capacity);
-app.use('/api/gap-no-after-care-churn-risk-model', route_gap_no_after_care_churn_risk_model);
-app.use('/api/gap-no-real-spa-frontend-public-static', route_gap_no_real_spa_frontend_public_static);
-app.use('/api/gap-no-webhook-subscribersdispatchers', route_gap_no_webhook_subscribersdispatchers);
-app.use('/api/gap-no-real-smtptwilio-integration-only-need', route_gap_no_real_smtptwilio_integration_only_need);
-app.use('/api/gap-no-file-upload-module-for-case', route_gap_no_file_upload_module_for_case);
-app.use('/api/gap-no-real-time-chat-with-families', route_gap_no_real_time_chat_with_families);
-app.use('/api/gap-no-payment-processing', route_gap_no_payment_processing);
+app.use('/api/governed-cases', require('./routes/governedCases')({ db, authMiddleware }));
 
 app.listen(PORT, async () => {
   console.log(`\n=== Eternal Haven Funeral Home Operations Manager ===`);
