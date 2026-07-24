@@ -773,9 +773,14 @@
         });
 
         demoBtn.addEventListener('click', function () {
-            document.getElementById('login-email').value = 'admin@eternalhaven.com';
-            document.getElementById('login-password').value = 'admin123';
-            doLogin('admin@eternalhaven.com', 'admin123');
+            var credentials = window.DEMO_CREDENTIALS;
+            if (!credentials) {
+                toast('Demo credentials are unavailable.', 'error');
+                return;
+            }
+            document.getElementById('login-email').value = credentials.email;
+            document.getElementById('login-password').value = credentials.password;
+            doLogin(credentials.email, credentials.password);
         });
 
         logoutBtn.addEventListener('click', logout);

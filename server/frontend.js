@@ -30,6 +30,13 @@ app.use('/api', (req, res) => {
 });
 
 const publicDir = path.join(__dirname, '..', 'public');
+app.get('/runtime-config.js', (_req, res) => {
+  const enabled = process.env.NODE_ENV !== 'production'
+    && process.env.ENABLE_DEMO_CREDENTIAL_AUTOFILL !== 'false'
+    && process.env.DEMO_EMAIL && process.env.DEMO_PASSWORD;
+  const credentials = enabled ? { email: process.env.DEMO_EMAIL, password: process.env.DEMO_PASSWORD } : null;
+  res.type('application/javascript').send(`window.DEMO_CREDENTIALS=${JSON.stringify(credentials)};`);
+});
 app.use(express.static(publicDir));
 app.get('*', (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
 app.listen(frontendPort, '127.0.0.1', () => {

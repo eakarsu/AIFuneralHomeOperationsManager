@@ -614,15 +614,19 @@ const bcrypt = require('bcryptjs');
     console.log('Seeding data...');
 
     // --- Users ---
-    const passwordHash = await bcrypt.hash('admin123', 10);
+    const demoEmail = process.env.DEMO_EMAIL || '';
+    const demoPassword = process.env.DEMO_PASSWORD || '';
+    if (!demoEmail.includes('@')) throw new Error('DEMO_EMAIL must be a valid email address');
+    if (demoPassword.length < 12) throw new Error('DEMO_PASSWORD must be at least 12 characters');
+    const passwordHash = await bcrypt.hash(demoPassword, 10);
     await db.query(`
       INSERT INTO users (email, password_hash, full_name, role) VALUES
-        ('admin@eternalhaven.com', $1, 'Robert Thornton', 'admin'),
+        ($2, $1, 'Robert Thornton', 'admin'),
         ('jmitchell@eternalhaven.com', $1, 'Janet Mitchell', 'director'),
         ('dwilson@eternalhaven.com', $1, 'David Wilson', 'embalmer'),
         ('smartinez@eternalhaven.com', $1, 'Sarah Martinez', 'office_admin'),
         ('kpatel@eternalhaven.com', $1, 'Kiran Patel', 'director')
-    `, [passwordHash]);
+    `, [passwordHash, demoEmail]);
     console.log('  - users seeded');
 
     // --- Cases (15) ---
@@ -1131,7 +1135,7 @@ const bcrypt = require('bcryptjs');
 
     console.log('\nDatabase seed completed successfully!');
     console.log('Summary:');
-    console.log('  - 5 users (admin: admin@eternalhaven.com / admin123)');
+    console.log('  - 5 users, including the environment-provisioned demo administrator');
     console.log('  - 15 cases');
     console.log('  - 15 services');
     console.log('  - 15 compliance records');
