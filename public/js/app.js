@@ -780,7 +780,6 @@
             }
             document.getElementById('login-email').value = credentials.email;
             document.getElementById('login-password').value = credentials.password;
-            doLogin(credentials.email, credentials.password);
         });
 
         logoutBtn.addEventListener('click', logout);
