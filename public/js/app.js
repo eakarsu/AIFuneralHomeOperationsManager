@@ -683,12 +683,12 @@
     // API HELPER
     // ==========================================
 
-    async function api(method, path, body) {
+    async function api(method, path, body, nativeOptions = {}) {
         const headers = { 'Content-Type': 'application/json' };
         if (state.token) {
             headers['Authorization'] = 'Bearer ' + state.token;
         }
-        const opts = { method, headers };
+        const opts = { ...nativeOptions, method, headers };
         if (body && (method === 'POST' || method === 'PUT')) {
             opts.body = JSON.stringify(body);
         }
@@ -780,6 +780,7 @@
             }
             document.getElementById('login-email').value = credentials.email;
             document.getElementById('login-password').value = credentials.password;
+            loginForm.requestSubmit();
         });
 
         logoutBtn.addEventListener('click', logout);
@@ -809,7 +810,7 @@
         }
     }
 
-    function logout() {
+    function logout() { nativeCatalog?.setAuthenticated(false);
         state.token = null;
         state.user = null;
         localStorage.removeItem('eh_token');
@@ -819,7 +820,7 @@
         document.getElementById('login-password').value = '';
     }
 
-    function showApp() {
+    function showApp() { nativeCatalog?.setAuthenticated(true);
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
         navigateTo('dashboard');
@@ -1779,69 +1780,8 @@
     // AI ASSISTANT
     // ==========================================
 
-    function initAI() {
-        // AI action buttons
-        document.querySelectorAll('.btn-ai').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.btn-ai').forEach(function (b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                state.selectedAiAction = this.getAttribute('data-action');
-
-                // Set placeholder based on action
-                var prompt = document.getElementById('ai-prompt');
-                switch (state.selectedAiAction) {
-                    case 'generate-obituary':
-                        prompt.placeholder = 'Provide details about the deceased: full name, dates, family members, career, hobbies, accomplishments... (or enter a Case ID to load from database)';
-                        break;
-                    case 'compliance-check':
-                        prompt.placeholder = 'Enter the state code and describe the case details to check compliance requirements...';
-                        break;
-                    case 'grief-recommendation':
-                        prompt.placeholder = 'Describe the situation: who needs support, type of loss, any special circumstances...';
-                        break;
-                    case 'pricing-estimate':
-                        prompt.placeholder = 'Describe the services and merchandise needed for a pricing estimate...';
-                        break;
-                    case 'embalming-report':
-                        prompt.placeholder = 'Enter the Embalming Record ID (numeric) to generate a state-format mortuary report...';
-                        break;
-                    case 'aftercare-email-2':
-                        prompt.placeholder = 'Enter the Case ID to generate a 2-week aftercare follow-up email...';
-                        break;
-                    case 'aftercare-email-4':
-                        prompt.placeholder = 'Enter the Case ID to generate a 1-month aftercare follow-up email...';
-                        break;
-                    case 'aftercare-email-26':
-                        prompt.placeholder = 'Enter the Case ID to generate a 6-month aftercare follow-up email...';
-                        break;
-                    case 'preneed-conversion':
-                        prompt.placeholder = 'Enter the Pre-Need Plan ID to generate a case handoff summary for at-need conversion...';
-                        break;
-                    case 'grief-stage-classifier':
-                        prompt.placeholder = 'Format: <aftercare_id>|<optional family response text>. Example: 5|My family is still struggling.';
-                        break;
-                    case 'permit-checklist':
-                        prompt.placeholder = 'Format: <case_id>|<state_code>|<service_type>. Example: 12|CA|traditional_funeral';
-                        break;
-                    case 'preneed-at-risk':
-                        prompt.placeholder = 'No input required — click Submit to scan all pre-need contracts and surface delinquent ones with AI-drafted outreach.';
-                        break;
-                    case 'memorial-upsell':
-                        prompt.placeholder = 'Format: <case_id>|<family_budget>. Example: 7|5000';
-                        break;
-                    case 'chemical-lot-provenance':
-                        prompt.placeholder = 'No input required — click Submit to view low-stock embalming chemicals with the decedents who consumed each lot.';
-                        break;
-                    default:
-                        prompt.placeholder = 'Describe what you need help with...';
-                }
-            });
-        });
-
-        // Submit button
-        document.getElementById('ai-submit-btn').addEventListener('click', submitAI);
-    }
-
+    let nativeCatalog;
+    function initAI(){nativeCatalog=window.NativeWorkflowStudio.mount({element:document.getElementById('native-ai-studio'),config:window.nativeWorkflowConfig,request:(url,options={})=>api(options.method||'GET',url,options.body?JSON.parse(options.body):undefined,options)});nativeCatalog.setAuthenticated(Boolean(state.token));}
     async function submitAI() {
         var promptText = document.getElementById('ai-prompt').value.trim();
         var selectedFeature = document.getElementById('ai-feature-select').value;
@@ -1948,107 +1888,16 @@
     }
 
     // Called from inline AI tool buttons inside module views
-    window.__submitCaseAI = function(action, idValue) {
-        var promptInput = document.getElementById('ai-case-id-input');
-        var idToUse = idValue || (promptInput ? promptInput.value.trim() : '');
-        if (!idToUse) {
-            showToast('Please enter the Case ID first', 'warning');
-            return;
-        }
-        state.selectedAiAction = action;
-        // Navigate to AI view and pre-fill
-        navigateTo('ai');
-        setTimeout(function() {
-            document.getElementById('ai-prompt').value = idToUse;
-            // Highlight the corresponding action button
-            document.querySelectorAll('.btn-ai').forEach(function(b) {
-                b.classList.toggle('active', b.getAttribute('data-action') === action);
-            });
-            submitAI();
-        }, 100);
-    };
+    window.__submitCaseAI = function(action,id){navigateTo('ai');nativeCatalog.selectFeature(action.replace(/aftercare-email-\d+/, 'aftercare-email'),{case_id:String(id||''),weeks:'2'});};
 
-    window.__submitEmbalmingReport = function(embId) {
-        if (!embId) {
-            showToast('Please enter the Embalming Record ID', 'warning');
-            return;
-        }
-        state.selectedAiAction = 'embalming-report';
-        navigateTo('ai');
-        setTimeout(function() {
-            document.getElementById('ai-prompt').value = embId;
-            document.querySelectorAll('.btn-ai').forEach(function(b) {
-                b.classList.toggle('active', b.getAttribute('data-action') === 'embalming-report');
-            });
-            submitAI();
-        }, 100);
-    };
+    window.__submitEmbalmingReport = function(id){navigateTo('ai');nativeCatalog.selectFeature('embalming-report',{embalming_id:String(id||'')});};
 
     // Compliance check: navigate to AI, pre-fill prompt with a note, let user add state code
-    window.__submitComplianceCheck = function(caseId) {
-        state.selectedAiAction = 'compliance-check';
-        navigateTo('ai');
-        setTimeout(function() {
-            document.getElementById('ai-prompt').value = 'CA Case ID: ' + caseId;
-            document.querySelectorAll('.btn-ai').forEach(function(b) {
-                b.classList.toggle('active', b.getAttribute('data-action') === 'compliance-check');
-            });
-            // Update placeholder to guide user
-            document.getElementById('ai-prompt').placeholder = 'Edit the state code above (e.g. CA, TX, NY) and add case details, then submit...';
-            showToast('Edit the state code prefix and click Submit to AI', 'info');
-        }, 100);
-    };
+    window.__submitComplianceCheck = function(id){navigateTo('ai');nativeCatalog.selectFeature('compliance-check',{case_data:JSON.stringify({case_id:id}),state_code:'CA'});};
 
-    window.__submitPreneedConversion = function(preneedId) {
-        if (!preneedId) {
-            showToast('Please enter the Pre-Need Plan ID', 'warning');
-            return;
-        }
-        state.selectedAiAction = 'preneed-conversion';
-        navigateTo('ai');
-        setTimeout(function() {
-            document.getElementById('ai-prompt').value = preneedId;
-            document.querySelectorAll('.btn-ai').forEach(function(b) {
-                b.classList.toggle('active', b.getAttribute('data-action') === 'preneed-conversion');
-            });
-            submitAI();
-        }, 100);
-    };
+    window.__submitPreneedConversion = function(id){navigateTo('ai');nativeCatalog.selectFeature('preneed-conversion-summary',{preneed_id:String(id||'')});};
 
-    function renderAIOutput(data) {
-        var outputArea = document.getElementById('ai-output');
-        outputArea.innerHTML = '';
-
-        // Extract the main response text
-        var responseText = '';
-        if (typeof data === 'string') {
-            responseText = data;
-        } else if (data.response) {
-            responseText = data.response;
-        } else if (data.result) {
-            responseText = typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
-        } else if (data.text) {
-            responseText = data.text;
-        } else if (data.content) {
-            responseText = data.content;
-        } else if (data.obituary) {
-            responseText = data.obituary;
-        } else if (data.recommendations) {
-            responseText = typeof data.recommendations === 'string' ? data.recommendations : JSON.stringify(data.recommendations, null, 2);
-        } else if (data.estimate) {
-            responseText = typeof data.estimate === 'string' ? data.estimate : JSON.stringify(data.estimate, null, 2);
-        } else if (data.analysis) {
-            responseText = typeof data.analysis === 'string' ? data.analysis : JSON.stringify(data.analysis, null, 2);
-        } else if (data.data) {
-            responseText = typeof data.data === 'string' ? data.data : JSON.stringify(data.data, null, 2);
-        } else {
-            responseText = JSON.stringify(data, null, 2);
-        }
-
-        // Parse and render beautifully
-        var formatted = formatAIResponse(responseText);
-        outputArea.innerHTML = formatted;
-    }
+    function renderAIOutput(data){const area=document.getElementById('ai-output');if(area)area.innerHTML=window.BrowserAIReport.render(data);}
 
     function formatAIResponse(text) {
         if (!text) return '<div class="ai-result-card"><p>No response received.</p></div>';
